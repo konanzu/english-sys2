@@ -26,19 +26,20 @@
     }
   </style>
 </head>
-<body onclick="changeText()">
+<body>
   <h1>単語リスト</h1>
-  <div>
+  <div onclick="event.stopPropagation();">
     番号指定：
     <input type="number" id="jumpNumber" min="1">
     <button onclick="jumpToNumber(event)">ジャンプ</button>
   </div>
 
-  <div id="text">読み込み中...</div>
+  <div id="text" onclick="changeText()">読み込み中...</div>
 
   <script>
-    let entries = [];  // 配列：[ { number: 1, word: "follow", meaning: "～の後に続く" } ]
-    let index = 0;//
+    let entries = []; // [{number: 1, word: 'follow', meaning: '～の後に続く、～に従う'}]
+    let index = 0;
+    let subIndex = 0; // 0:番号, 1:単語, 2:意味
 
     async function loadTexts() {
       const res = await fetch('texts.txt');
@@ -49,7 +50,7 @@
         .map(line => line.trim())
         .filter(line => line !== '')
         .map(line => {
-          const parts = line.split(/\s+/); // 空白やタブで分割
+          const parts = line.split(/\s+/); // 空白・タブ対応
           return {
             number: parseInt(parts[0]),
             word: parts[1],
@@ -58,6 +59,8 @@
         });
 
       if (entries.length > 0) {
+        index = 0;
+        subIndex = 0;
         showText();
       } else {
         document.getElementById("text").textContent = "表示する単語がありません";
@@ -65,22 +68,44 @@
     }
 
     function showText() {
+      if (entries.length === 0) return;
+
       const entry = entries[index];
-      document.getElementById("text").textContent = `${entry.number}. ${entry.word} - ${entry.meaning}`;
+      let display = "";
+
+      switch (subIndex) {
+        case 0:
+          display = `${entry.number}.`;
+          break;
+        case 1:
+          display = entry.word;
+          break;
+        case 2:
+          display = entry.meaning;
+          break;
+      }
+
+      document.getElementById("text").textContent = display;
     }
 
     function changeText() {
       if (entries.length === 0) return;
-      index = (index + 1) % entries.length;
+
+      subIndex++;
+      if (subIndex > 2) {
+        subIndex = 0;
+        index = (index + 1) % entries.length;
+      }
       showText();
     }
 
     function jumpToNumber(event) {
-      event.stopPropagation(); // bodyのタップイベントを防ぐ
+      event.stopPropagation(); // bodyのタップ無効化
       const num = parseInt(document.getElementById("jumpNumber").value);
       const foundIndex = entries.findIndex(e => e.number === num);
       if (foundIndex !== -1) {
         index = foundIndex;
+        subIndex = 0;
         showText();
       } else {
         alert("その番号は見つかりませんでした");
