@@ -41,9 +41,6 @@
     let subIndex = 0; // 0: 番号＋英語, 1: 意味
 
     async function loadTexts() {
-      const res = await fetch('texts.txt');
-      const content = await res.text();
-
     entries = content
       .split('\n')
       .map(line => line.trim())
@@ -58,10 +55,6 @@
           : null;
       })
       .filter(entry => entry !== null);
-
-      index = 0;
-      subIndex = 0;
-      showText();
     }
 
     function showText() {
