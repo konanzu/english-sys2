@@ -9,37 +9,36 @@
       text-align: center;
       padding: 30px;
       user-select: none;
+      margin: 0;
     }
+
     #text {
       font-size: 2rem;
       margin-top: 50px;
+      padding: 20px;
     }
-    input[type="number"] {
+
+    input[type="number"], button {
       font-size: 1.2rem;
-      padding: 5px;
-      width: 80px;
-    }
-    button {
-      font-size: 1.2rem;
-      padding: 5px 10px;
-      margin-left: 10px;
+      padding: 8px;
+      margin: 10px 5px;
     }
   </style>
 </head>
-<body>
+<body ontouchstart="" onclick="handleBodyClick(event)">
   <h1>単語リスト</h1>
-  <div onclick="event.stopPropagation();">
+  <div id="control" onclick="event.stopPropagation();">
     番号指定：
     <input type="number" id="jumpNumber" min="1">
     <button onclick="jumpToNumber(event)">ジャンプ</button>
   </div>
 
-  <div id="text" onclick="changeText()">読み込み中...</div>
+  <div id="text">読み込み中...</div>
 
   <script>
-    let entries = []; // [{number: 1, word: 'follow', meaning: '～の後に続く、～に従う'}]
+    let entries = []; // [{number: 1, word: 'follow', meaning: '～'}]
     let index = 0;
-    let subIndex = 0; // 0:番号, 1:単語, 2:意味
+    let subIndex = 0; // 0: 番号＋英語, 1: 意味
 
     async function loadTexts() {
       const res = await fetch('texts.txt');
@@ -50,7 +49,7 @@
         .map(line => line.trim())
         .filter(line => line !== '')
         .map(line => {
-          const parts = line.split(/\s+/); // 空白・タブ対応
+          const parts = line.split(/\s+/); // 空白・タブで分割
           return {
             number: parseInt(parts[0]),
             word: parts[1],
@@ -58,41 +57,27 @@
           };
         });
 
-      if (entries.length > 0) {
-        index = 0;
-        subIndex = 0;
-        showText();
-      } else {
-        document.getElementById("text").textContent = "表示する単語がありません";
-      }
+      index = 0;
+      subIndex = 0;
+      showText();
     }
 
     function showText() {
-      if (entries.length === 0) return;
-
       const entry = entries[index];
-      let display = "";
+      const textBox = document.getElementById("text");
 
-      switch (subIndex) {
-        case 0:
-          display = `${entry.number}.`;
-          break;
-        case 1:
-          display = entry.word;
-          break;
-        case 2:
-          display = entry.meaning;
-          break;
+      if (subIndex === 0) {
+        textBox.textContent = `${entry.number}. ${entry.word}`;
+      } else if (subIndex === 1) {
+        textBox.textContent = entry.meaning;
       }
-
-      document.getElementById("text").textContent = display;
     }
 
     function changeText() {
       if (entries.length === 0) return;
 
       subIndex++;
-      if (subIndex > 2) {
+      if (subIndex > 1) {
         subIndex = 0;
         index = (index + 1) % entries.length;
       }
@@ -100,7 +85,7 @@
     }
 
     function jumpToNumber(event) {
-      event.stopPropagation(); // bodyのタップ無効化
+      event.stopPropagation();
       const num = parseInt(document.getElementById("jumpNumber").value);
       const foundIndex = entries.findIndex(e => e.number === num);
       if (foundIndex !== -1) {
@@ -110,6 +95,12 @@
       } else {
         alert("その番号は見つかりませんでした");
       }
+    }
+
+    function handleBodyClick(event) {
+      // 入力欄やボタンのクリックは除外
+      if (event.target.closest('#control')) return;
+      changeText();
     }
 
     loadTexts();
