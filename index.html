@@ -14,20 +14,25 @@
 
     #text {
       font-size: 2rem;
-      margin-top: 50px;
-      padding: 20px;
+      margin: 40px 0;
+      min-height: 3em;
     }
 
     input[type="number"], button {
       font-size: 1.2rem;
       padding: 8px;
-      margin: 10px 5px;
+      margin: 5px;
+    }
+
+    #buttons {
+      margin-top: 20px;
     }
   </style>
 </head>
-<body ontouchstart="" onclick="handleBodyClick(event)">
+<body>
   <h1>単語リスト</h1>
-  <div id="control" onclick="event.stopPropagation();">
+
+  <div>
     番号指定：
     <input type="number" id="jumpNumber" min="1">
     <button onclick="jumpToNumber(event)">ジャンプ</button>
@@ -35,42 +40,44 @@
 
   <div id="text">読み込み中...</div>
 
+  <div id="buttons">
+    <button onclick="prev()">Prev</button>
+    <button onclick="next()">Next</button>
+  </div>
+
   <script>
-    let entries = []; // [{number: 1, word: 'follow', meaning: '～'}]
+    let entries = [];
     let index = 0;
-    let subIndex = 0; // 0: 番号＋英語, 1: 意味
+    let subIndex = 0; // 0: 単語, 1: 意味
 
     async function loadTexts() {
       try {
         const res = await fetch('texts.txt');
         const content = await res.text();
-    
+
         const lines = content
           .split('\n')
           .map(line => line.trim())
           .filter(line => line !== '');
-    
+
         entries = [];
-    
+
         for (let i = 0; i < lines.length - 1; i += 2) {
           const parts = lines[i].split(/\s+/);
           const num = parseInt(parts[0]);
           const word = parts[1];
           const meaning = lines[i + 1];
-    
-          if (!num || !word || !meaning) {
-            console.warn("スキップされた行:", lines[i], lines[i + 1]);
-            continue;
-          }
-    
+
+          if (!num || !word || !meaning) continue;
+
           entries.push({ number: num, word: word, meaning: meaning });
         }
-    
+
         if (entries.length === 0) {
-          document.getElementById("text").textContent = "読み込み失敗：データがありません";
+          document.getElementById("text").textContent = "データが読み込めませんでした";
           return;
         }
-    
+
         index = 0;
         subIndex = 0;
         showText();
@@ -80,26 +87,33 @@
       }
     }
 
-
-
     function showText() {
       const entry = entries[index];
-      const textBox = document.getElementById("text");
+      const display = subIndex === 0
+        ? `${entry.number}. ${entry.word}`
+        : entry.meaning;
 
-      if (subIndex === 0) {
-        textBox.textContent = `${entry.number}. ${entry.word}`;
-      } else if (subIndex === 1) {
-        textBox.textContent = entry.meaning;
-      }
+      document.getElementById("text").textContent = display;
     }
 
-    function changeText() {
+    function next() {
       if (entries.length === 0) return;
 
       subIndex++;
       if (subIndex > 1) {
         subIndex = 0;
         index = (index + 1) % entries.length;
+      }
+      showText();
+    }
+
+    function prev() {
+      if (entries.length === 0) return;
+
+      subIndex--;
+      if (subIndex < 0) {
+        index = (index - 1 + entries.length) % entries.length;
+        subIndex = 1;
       }
       showText();
     }
@@ -115,12 +129,6 @@
       } else {
         alert("その番号は見つかりませんでした");
       }
-    }
-
-    function handleBodyClick(event) {
-      // 入力欄やボタンのクリックは除外
-      if (event.target.closest('#control')) return;
-      changeText();
     }
 
     loadTexts();
