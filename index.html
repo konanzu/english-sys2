@@ -41,20 +41,27 @@
     let subIndex = 0; // 0: 番号＋英語, 1: 意味
 
     async function loadTexts() {
-    entries = content
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line !== '')
-      .map(line => {
-        const parts = line.split(/\s+/);
-        const num = parseInt(parts[0]);
-        const word = parts[1];
-        const meaning = parts.slice(2).join(' ');
-        return (num && word && meaning)
-          ? { number: num, word: word, meaning: meaning }
-          : null;
-      })
-      .filter(entry => entry !== null);
+      const res = await fetch('texts.txt');
+      const content = await res.text();
+    
+      entries = content
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line !== '')
+        .map(line => {
+          const parts = line.split(/\s+/);
+          const num = parseInt(parts[0]);
+          const word = parts[1];
+          const meaning = parts.slice(2).join(' ');
+          return (num && word && meaning)
+            ? { number: num, word: word, meaning: meaning }
+            : null;
+        })
+        .filter(entry => entry !== null);
+    
+      index = 0;
+      subIndex = 0;
+      showText();
     }
 
     function showText() {
