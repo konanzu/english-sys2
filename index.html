@@ -2,37 +2,89 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>文字切り替え</title>
+  <title>単語表示</title>
   <style>
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-size: 2rem;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
       user-select: none;
-      margin: 0;
+    }
+    #text {
+      font-size: 2rem;
+      margin-top: 50px;
+    }
+    input[type="number"] {
+      font-size: 1.2rem;
+      padding: 5px;
+      width: 80px;
+    }
+    button {
+      font-size: 1.2rem;
+      padding: 5px 10px;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body onclick="changeText()">
+  <h1>単語リスト</h1>
+  <div>
+    番号指定：
+    <input type="number" id="jumpNumber" min="1">
+    <button onclick="jumpToNumber(event)">ジャンプ</button>
+  </div>
+
   <div id="text">読み込み中...</div>
 
   <script>
-    let texts = [];
+    let entries = [];  // 配列：[ { number: 1, word: "follow", meaning: "～の後に続く" } ]
     let index = 0;
 
     async function loadTexts() {
       const res = await fetch('texts.txt');
       const content = await res.text();
-      texts = content.split('\n').filter(line => line.trim() !== '');
-      document.getElementById("text").textContent = texts[0];
+
+      entries = content
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line !== '')
+        .map(line => {
+          const parts = line.split(/\s+/); // 空白やタブで分割
+          return {
+            number: parseInt(parts[0]),
+            word: parts[1],
+            meaning: parts.slice(2).join(' ')
+          };
+        });
+
+      if (entries.length > 0) {
+        showText();
+      } else {
+        document.getElementById("text").textContent = "表示する単語がありません";
+      }
+    }
+
+    function showText() {
+      const entry = entries[index];
+      document.getElementById("text").textContent = `${entry.number}. ${entry.word} - ${entry.meaning}`;
     }
 
     function changeText() {
-      if (texts.length === 0) return;
-      index = (index + 1) % texts.length;
-      document.getElementById("text").textContent = texts[index];
+      if (entries.length === 0) return;
+      index = (index + 1) % entries.length;
+      showText();
+    }
+
+    function jumpToNumber(event) {
+      event.stopPropagation(); // bodyのタップイベントを防ぐ
+      const num = parseInt(document.getElementById("jumpNumber").value);
+      const foundIndex = entries.findIndex(e => e.number === num);
+      if (foundIndex !== -1) {
+        index = foundIndex;
+        showText();
+      } else {
+        alert("その番号は見つかりませんでした");
+      }
     }
 
     loadTexts();
