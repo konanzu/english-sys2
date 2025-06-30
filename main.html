@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>文字切り替え</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-size: 2rem;
+      user-select: none;
+      margin: 0;
+    }
+  </style>
+</head>
+<body onclick="changeText()">
+  <div id="text">読み込み中...</div>
+
+  <script>
+    let texts = [];
+    let index = 0;
+
+    async function loadTexts() {
+      const res = await fetch('texts.txt');
+      const content = await res.text();
+      texts = content.split('\n').filter(line => line.trim() !== '');
+      document.getElementById("text").textContent = texts[0];
+    }
+
+    function changeText() {
+      if (texts.length === 0) return;
+      index = (index + 1) % texts.length;
+      document.getElementById("text").textContent = texts[index];
+    }
+
+    loadTexts();
+  </script>
+</body>
+</html>
