@@ -43,27 +43,31 @@
     async function loadTexts() {
       try {
         const res = await fetch('texts.txt');
-        const content = await res.text();  // ← これ絶対必要！！
+        const content = await res.text();
     
-        entries = content
+        const lines = content
           .split('\n')
           .map(line => line.trim())
-          .filter(line => line !== '')
-          .map(line => {
-            const parts = line.split(/\s+/);
-            const num = parseInt(parts[0]);
-            const word = parts[1];
-            const meaning = parts.slice(2).join(' ');
-            if (!num || !word || !meaning) {
-              console.warn("無効な行：", line);
-              return null;
-            }
-            return { number: num, word: word, meaning: meaning };
-          })
-          .filter(entry => entry !== null);
+          .filter(line => line !== '');
+    
+        entries = [];
+    
+        for (let i = 0; i < lines.length - 1; i += 2) {
+          const parts = lines[i].split(/\s+/);
+          const num = parseInt(parts[0]);
+          const word = parts[1];
+          const meaning = lines[i + 1];
+    
+          if (!num || !word || !meaning) {
+            console.warn("スキップされた行:", lines[i], lines[i + 1]);
+            continue;
+          }
+    
+          entries.push({ number: num, word: word, meaning: meaning });
+        }
     
         if (entries.length === 0) {
-          document.getElementById("text").textContent = "データが読み込めませんでした";
+          document.getElementById("text").textContent = "読み込み失敗：データがありません";
           return;
         }
     
@@ -75,6 +79,7 @@
         document.getElementById("text").textContent = "読み込み中にエラーが発生しました";
       }
     }
+
 
 
     function showText() {
