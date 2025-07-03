@@ -105,6 +105,7 @@
     let entries = [];
     let index = 0;
     let subIndex = 0; // 0: 単語, 1: 意味
+	let viewEntries = [];
 
     async function loadTexts() {
       try {
@@ -137,42 +138,43 @@
         index = 0;
         subIndex = 0;
         showText();
+		viewEntries = [...entries];
       } catch (err) {
         console.error("読み込みエラー:", err);
         document.getElementById("text").textContent = "読み込み中にエラーが発生しました";
       }
     }
 
-    function showText() {
-      const entry = entries[index];
-      const display = subIndex === 0
-        ? `${entry.number}. ${entry.word}`
-        : entry.meaning;
+	function showText() {
+	  const entry = viewEntries[index]; // ←ここ変更！
+	  const display = subIndex === 0
+		? `${entry.number}. ${entry.word}`
+		: entry.meaning;
 
-      document.getElementById("text").textContent = display;
-    }
+	  document.getElementById("text").textContent = display;
+	}
 
 	function next() {
-	  if (entries.length === 0) return;
+	  if (viewEntries.length === 0) return;
 
 	  if (subIndex === 0) {
-		subIndex = 1; // 意味表示へ
+		subIndex = 1;
 	  } else {
-		index = (index + 1) % entries.length;
-		subIndex = 0; // 次の単語へ
+		index = (index + 1) % viewEntries.length;
+		subIndex = 0;
 	  }
 
 	  showText();
 	}
 
 	function prev() {
-	  if (entries.length === 0) return;
+	  if (viewEntries.length === 0) return;
 
 	  if (subIndex === 1) {
-		subIndex = 0; // 単語に戻る
+		subIndex = 0;
 	  } else {
-		index = (index - 1 + entries.length) % entries.length;
-		subIndex = 1; // 前の意味へ
+		index = (index - 1 + viewEntries.length) % viewEntries.length;
+		subIndex = 1;
 	  }
 
 	  showText();
@@ -195,27 +197,19 @@
 		return;
 	  }
 
-	  // 範囲に該当する要素だけを取り出す
-	  const inRange = entries.filter(e => e.number >= startNum && e.number <= endNum);
-	  const outOfRange = entries.filter(e => e.number < startNum || e.number > endNum);
+	  // 元データからシャッフル対象を選別
+	  const inRange = viewEntries.filter(e => e.number >= startNum && e.number <= endNum);
+	  const outOfRange = viewEntries.filter(e => e.number < startNum || e.number > endNum);
 
-	  if (inRange.length === 0) {
-		alert("その範囲に該当する単語がありません");
-		return;
-	  }
-
-	  // シャッフル（Fisher-Yates）
+	  // シャッフル処理
 	  for (let i = inRange.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[inRange[i], inRange[j]] = [inRange[j], inRange[i]];
 	  }
 
-	  // entriesを新しい順に再構成（番号順でなくてもOK）
-	  entries = [...outOfRange, ...inRange];
-
-	  // 最初のシャッフル済み要素の表示
-	  const firstIndex = entries.findIndex(e => inRange.includes(e));
-	  index = firstIndex;
+	  // 表示順を更新
+	  viewEntries = [...outOfRange, ...inRange];
+	  index = 0;
 	  subIndex = 0;
 	  showText();
 	}
