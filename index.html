@@ -81,18 +81,29 @@
 	  margin-bottom: 10px;
 	}
 	
+	.jump-area {
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  gap: 8px;
+	  flex-wrap: wrap;
+	  margin-bottom: 15px;
+	}
+
+	
   </style>
 </head>
 <body>
   <h1>単語リスト</h1>
 
-  <div>
-    番号指定：
-    <input type="number" id="jumpNumber" min="1">
-    <button onclick="jumpToNumber(event)">ジャンプ</button>
-  </div>
+	<div class="jump-area">
+	  <label for="jumpNumber">番号指定：</label>
+	  <input type="number" id="jumpNumber" min="1">
+	  <button onclick="jumpToNumber(event)">ジャンプ</button>
+	</div>
 
-  <div id="text">読み込み中...</div>
+
+	<div id="text">読み込み中...</div>
 
 	<div id="buttons">
 	  <button class="nav-button" onclick="prev()">Prev</button>
@@ -104,7 +115,7 @@
 		シャッフル範囲：
 		<input type="number" id="shuffleStart" placeholder="開始番号" min="1" value = "1">
 		～ 
-		<input type="number" id="shuffleEnd" placeholder="終了番号" min="1" value = "499">
+		<input type="number" id="shuffleEnd" placeholder="終了番号" min="1" value = "500">
 	  </div>
 	  <button onclick="shuffleEntries()">シャッフル</button>
 	  <button onclick="resetShuffle()">解除</button>
