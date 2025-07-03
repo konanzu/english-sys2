@@ -89,11 +89,6 @@
 	  <button class="nav-button" onclick="prev()">Prev</button>
 	  <button class="nav-button" onclick="next()">Next</button>
 	</div>
-
-	<!-- シャッフルボタンを下に分けて配置 -->
-	<div id="shuffle-area">
-	  <button onclick="shuffleEntries()">シャッフル</button>
-	</div>
 	
 	<div id="shuffle-area">
 	  <div>
@@ -195,29 +190,31 @@
 		return;
 	  }
 
-	  // 指定範囲のindexを取得
-	  const startIndex = entries.findIndex(e => e.number === startNum);
-	  const endIndex = entries.findIndex(e => e.number === endNum);
+	  // 範囲に該当する要素だけを取り出す
+	  const inRange = entries.filter(e => e.number >= startNum && e.number <= endNum);
+	  const outOfRange = entries.filter(e => e.number < startNum || e.number > endNum);
 
-	  if (startIndex === -1 || endIndex === -1) {
-		alert("指定した番号が見つかりませんでした");
+	  if (inRange.length === 0) {
+		alert("その範囲に該当する単語がありません");
 		return;
 	  }
 
-	  // 指定範囲だけをシャッフル（Fisher-Yates）
-	  const range = entries.slice(startIndex, endIndex + 1);
-	  for (let i = range.length - 1; i > 0; i--) {
+	  // シャッフル（Fisher-Yates）
+	  for (let i = inRange.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
-		[range[i], range[j]] = [range[j], range[i]];
+		[inRange[i], inRange[j]] = [inRange[j], inRange[i]];
 	  }
 
-	  // 結果を entries に反映
-	  entries.splice(startIndex, range.length, ...range);
+	  // entriesを新しい順に再構成（番号順でなくてもOK）
+	  entries = [...outOfRange, ...inRange];
 
-	  index = startIndex;
+	  // 最初のシャッフル済み要素の表示
+	  const firstIndex = entries.findIndex(e => inRange.includes(e));
+	  index = firstIndex;
 	  subIndex = 0;
 	  showText();
 	}
+
 
 
 
