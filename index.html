@@ -104,7 +104,7 @@
 		シャッフル範囲：
 		<input type="number" id="shuffleStart" placeholder="開始番号" min="1" value = "1">
 		～ 
-		<input type="number" id="shuffleEnd" placeholder="終了番号" min="1" value = "1">
+		<input type="number" id="shuffleEnd" placeholder="終了番号" min="1" value = "500">
 	  </div>
 	  <button onclick="shuffleEntries()">シャッフル</button>
 	  <button onclick="resetShuffle()">解除</button>
@@ -116,7 +116,7 @@
     let index = 0;
     let subIndex = 0; // 0: 単語, 1: 意味
 	let viewEntries = [];
-	let saveShuffle = 0
+	let saveShuffle = 0;
 
     async function loadTexts() {
       try {
