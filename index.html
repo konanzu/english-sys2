@@ -137,8 +137,8 @@
 
         index = 0;
         subIndex = 0;
-        showText();
 		viewEntries = [...entries];
+        showText();
       } catch (err) {
         console.error("読み込みエラー:", err);
         document.getElementById("text").textContent = "読み込み中にエラーが発生しました";
