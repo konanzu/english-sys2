@@ -71,6 +71,15 @@
 	  width: 100px;
 	}
 
+	.shuffle-range {
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  flex-wrap: nowrap;
+	  gap: 8px;
+	  flex-direction: row;
+	  margin-bottom: 10px;
+	}
 	
   </style>
 </head>
@@ -91,11 +100,11 @@
 	</div>
 	
 	<div id="shuffle-area">
-	  <div>
+	  <div class = "shuffle-range">
 		シャッフル範囲：
-		<input type="number" id="shuffleStart" placeholder="開始番号" min="1">
+		<input type="number" id="shuffleStart" placeholder="開始番号" min="1" value = "1">
 		～ 
-		<input type="number" id="shuffleEnd" placeholder="終了番号" min="1">
+		<input type="number" id="shuffleEnd" placeholder="終了番号" min="1" value = "1">
 	  </div>
 	  <button onclick="shuffleEntries()">シャッフル</button>
 	  <button onclick="resetShuffle()">解除</button>
