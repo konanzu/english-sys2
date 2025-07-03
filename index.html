@@ -46,6 +46,30 @@
 		margin: 4px;
 	  }
 	}
+	
+	/* Prev, Next ボタン用のクラス */
+	.nav-button {
+	  font-size: 2rem; /* 大きめ */
+	  padding: 12px 24px;
+	  margin: 10px;
+	}
+
+	/* シャッフルボタンの位置調整 */
+	#shuffle-area {
+	  margin-top: 20px;
+	}
+
+	#shuffle-area button {
+	  font-size: 1.2rem;
+	  padding: 8px 16px;
+	}
+	
+	#shuffle-area input {
+	  font-size: 1rem;
+	  padding: 6px;
+	  margin: 4px;
+	  width: 100px;
+	}
 
 	
   </style>
@@ -61,11 +85,26 @@
 
   <div id="text">読み込み中...</div>
 
-  <div id="buttons">
-    <button onclick="prev()">Prev</button>
-    <button onclick="next()">Next</button>
-	<button onclick="shuffleEntries()">シャッフル</button> <!-- 追加 -->
-  </div>
+	<div id="buttons">
+	  <button class="nav-button" onclick="prev()">Prev</button>
+	  <button class="nav-button" onclick="next()">Next</button>
+	</div>
+
+	<!-- シャッフルボタンを下に分けて配置 -->
+	<div id="shuffle-area">
+	  <button onclick="shuffleEntries()">シャッフル</button>
+	</div>
+	
+	<div id="shuffle-area">
+	  <div>
+		シャッフル範囲：
+		<input type="number" id="shuffleStart" placeholder="開始番号" min="1">
+		～ 
+		<input type="number" id="shuffleEnd" placeholder="終了番号" min="1">
+	  </div>
+	  <button onclick="shuffleEntries()">シャッフル</button>
+	</div>
+
 
   <script>
     let entries = [];
@@ -143,15 +182,43 @@
 	function shuffleEntries() {
 	  if (entries.length === 0) return;
 
-	  for (let i = entries.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[entries[i], entries[j]] = [entries[j], entries[i]];
+	  const startNum = parseInt(document.getElementById("shuffleStart").value);
+	  const endNum = parseInt(document.getElementById("shuffleEnd").value);
+
+	  if (isNaN(startNum) || isNaN(endNum)) {
+		alert("開始番号と終了番号を入力してください");
+		return;
 	  }
 
-	  index = 0;
+	  if (startNum >= endNum) {
+		alert("開始番号は終了番号より小さくしてください");
+		return;
+	  }
+
+	  // 指定範囲のindexを取得
+	  const startIndex = entries.findIndex(e => e.number === startNum);
+	  const endIndex = entries.findIndex(e => e.number === endNum);
+
+	  if (startIndex === -1 || endIndex === -1) {
+		alert("指定した番号が見つかりませんでした");
+		return;
+	  }
+
+	  // 指定範囲だけをシャッフル（Fisher-Yates）
+	  const range = entries.slice(startIndex, endIndex + 1);
+	  for (let i = range.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[range[i], range[j]] = [range[j], range[i]];
+	  }
+
+	  // 結果を entries に反映
+	  entries.splice(startIndex, range.length, ...range);
+
+	  index = startIndex;
 	  subIndex = 0;
 	  showText();
 	}
+
 
 
     function jumpToNumber(event) {
