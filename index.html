@@ -217,18 +217,19 @@
 
 
 
-    function jumpToNumber(event) {
-      event.stopPropagation();
-      const num = parseInt(document.getElementById("jumpNumber").value);
-      const foundIndex = entries.findIndex(e => e.number === num);
-      if (foundIndex !== -1) {
-        index = foundIndex;
-        subIndex = 0;
-        showText();
-      } else {
-        alert("その番号は見つかりませんでした");
-      }
-    }
+	function jumpToNumber(event) {
+	  event.stopPropagation();
+	  const num = parseInt(document.getElementById("jumpNumber").value);
+	  const foundIndex = viewEntries.findIndex(e => e.number === num); // ← viewEntriesで探す
+	  if (foundIndex !== -1) {
+		index = foundIndex;
+		subIndex = 0;
+		showText();
+	  } else {
+		alert("その番号は見つかりませんでした");
+	  }
+	}
+
 
     loadTexts();
   </script>
