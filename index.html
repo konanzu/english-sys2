@@ -197,22 +197,34 @@
 		return;
 	  }
 
-	  // 元データからシャッフル対象を選別
-	  const inRange = viewEntries.filter(e => e.number >= startNum && e.number <= endNum);
-	  const outOfRange = viewEntries.filter(e => e.number < startNum || e.number > endNum);
+	  // 元データから範囲内の単語を取得
+	  const inRange = entries.filter(e => e.number >= startNum && e.number <= endNum);
+	  if (inRange.length === 0) {
+		alert("その範囲に該当する単語がありません");
+		return;
+	  }
 
-	  // シャッフル処理
+	  // 範囲外は元の順番のまま
+	  const outOfRange = entries.filter(e => e.number < startNum || e.number > endNum);
+
+	  // シャッフル
 	  for (let i = inRange.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[inRange[i], inRange[j]] = [inRange[j], inRange[i]];
 	  }
 
-	  // 表示順を更新
+	  // outOfRange と inRange を結合（順番は変えず）
 	  viewEntries = [...outOfRange, ...inRange];
-	  index = 0;
+
+	  // シャッフル範囲の先頭が viewEntries の何番目か取得してそこから表示開始
+	  const firstInRangeNumber = inRange[0].number;
+	  const firstInRangeIndex = viewEntries.findIndex(e => e.number === firstInRangeNumber);
+
+	  index = firstInRangeIndex !== -1 ? firstInRangeIndex : 0;
 	  subIndex = 0;
 	  showText();
 	}
+
 
 
 
