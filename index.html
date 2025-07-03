@@ -152,27 +152,32 @@
       document.getElementById("text").textContent = display;
     }
 
-    function next() {
-      if (entries.length === 0) return;
+	function next() {
+	  if (entries.length === 0) return;
 
-      subIndex++;
-      if (subIndex > 1) {
-        subIndex = 0;
-        index = (index + 1) % entries.length;
-      }
-      showText();
-    }
+	  if (subIndex === 0) {
+		subIndex = 1; // 意味表示へ
+	  } else {
+		index = (index + 1) % entries.length;
+		subIndex = 0; // 次の単語へ
+	  }
 
-    function prev() {
-      if (entries.length === 0) return;
+	  showText();
+	}
 
-      subIndex--;
-      if (subIndex < 0) {
-        index = (index - 1 + entries.length) % entries.length;
-        subIndex = 1;
-      }
-      showText();
-    }
+	function prev() {
+	  if (entries.length === 0) return;
+
+	  if (subIndex === 1) {
+		subIndex = 0; // 単語に戻る
+	  } else {
+		index = (index - 1 + entries.length) % entries.length;
+		subIndex = 1; // 前の意味へ
+	  }
+
+	  showText();
+	}
+
 	
 	function shuffleEntries() {
 	  if (entries.length === 0) return;
