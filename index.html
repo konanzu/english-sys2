@@ -107,6 +107,7 @@
     let index = 0;
     let subIndex = 0; // 0: 単語, 1: 意味
 	let viewEntries = [];
+	let saveShuffle = 0
 
     async function loadTexts() {
       try {
@@ -165,6 +166,7 @@
 		subIndex = 0;
 	  }
 
+	  saveShuffle = index;
 	  showText();
 	}
 
@@ -178,6 +180,7 @@
 		subIndex = 1;
 	  }
 
+	  saveShuffle = index;
 	  showText();
 	}
 
@@ -240,7 +243,7 @@
 
 	function resetShuffle() {
 	  viewEntries = [...entries];  // 元データ順に戻す
-	  index = 0;
+	  index = saveShuffle;
 	  subIndex = 0;
 	  showText();
 	}
